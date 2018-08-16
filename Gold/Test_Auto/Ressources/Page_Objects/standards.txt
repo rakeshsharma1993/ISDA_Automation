@@ -1,0 +1,193 @@
+*** Settings ***
+Library           Selenium2Library
+Library           ../../Lib_Python/Navigate.py
+Library           ../../Lib_Python/testNode.py
+Resource          ../conf/standard.txt
+Library           OperatingSystem
+Resource          ../conf/conf_MSS.txt
+Library           String
+Library           Process
+
+*** Keywords ***
+!interfaceTest
+    Run Keyword If    '${reporting}' == 'init'    Pass Execution    Initialisation fichier log
+    !CheckStatusTest
+    ${NODE_NAME}=    Get Environment Variable    NODE_NAME
+    ${tmp_browser}=    Set Variable    ${browser}
+    ${Plateforme}=    Get Environment Variable    Plateforme
+    Run Keyword If    '${NODE_NAME}' == 'master'    !PathConfGrid    ${Plateforme}
+    Run Keyword If    '${NODE_NAME}' == 'PermanentSlave'    !PathConfSlave    ${Plateforme}
+    Set Global Variable    ${plateforme}    ${Plateforme}
+    Set Global Variable    ${browser}    ${tmp_browser}
+
+!CheckStatusTest
+    Run Keyword If    '${ForcerStatus}' == 'PASS'    Pass Execution    Status du test force à l'état PASS
+    Run Keyword If    '${ForcerStatus}' == 'FAIL'    Fatal Error    Status du test force à l'état FAIL
+
+!connexion
+    [Arguments]    ${url}    ${id}    ${pwd}    ${slGrid}    ${title}    ${urlApp}
+    [Documentation]    Start browser on Selenium Grid
+    !interfaceTest
+    ${url}=    Navigate.Encode Url    ${urlApp}    ${url}
+    Comment    log    ${urlApp}    WARN
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'True' or '${slGrid}' == 'true'    !loadPageGrid    ${url}    ${browser}
+    Select Window
+    !logon    ${title}    ${id}    ${pwd}
+
+!connexionMSS
+    [Arguments]    ${url}    ${login}    ${pwd}
+    !interfaceTest
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'True' or '${slGrid}' == 'true'    !loadPageGrid    ${url}    ${browser}
+    Wait Until Page Contains    Welcome to My Service Space    20
+    Maximize Browser Window
+    !InputText    xpath=//input[@id='username']    ${login}
+    !InputText    xpath=//input[@id='password']    ${pwd}
+    !ClickElement    xpath=//button[@id="submit-button"]
+
+!ConnexionPagaie
+    [Arguments]    ${url}    ${id}    ${pwd}    ${slGrid}    ${title}    ${loginId}
+    ...    ${pwdId}
+    !interfaceTest
+    Run Keyword If    '${reporting}' == 'init'    Pass Execution    Initialisation fichier log
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'True' or '${slGrid}' == 'true'    !loadPageGrid    ${url}    ${browser}
+    Sleep    2
+    Navigate.Dismiss Poppup
+    Sleep    2
+    !InputText    ${loginId}    ${id}
+    Input Password    ${pwdId}    ${pwd}
+    Run Keyword If    '${plateforme}' == 'AM' or '${plateforme}' == 'E1' or '${plateforme}' == 'PEXP'    !ClickLink    xpath=//a[@href="javascript:click_valider()"]
+    Run Keyword If    '${plateforme}' == 'PROD'    !ClickButton    ctl00_ContentPlaceHolder_validButton
+
+!ChangerApp
+    [Arguments]    ${url}    ${id}    ${pwd}    ${slGrid}    ${title}    ${urlApp}
+    ${url}=    Navigate.Encode Url    ${urlApp}    ${url}
+    log    ${urlApp}    WARN
+    Switch Url    ${url}
+    Select Window
+    !logon    ${title}    ${id}    ${pwd}
+
+!logon
+    [Arguments]    ${title}    ${id}    ${pwd}
+    Select Window
+    !InputText    user    ${id}
+    Input Password    password    ${pwd}
+    Save Windows List
+    !ClickElement    linkValidForm
+    Run Keyword And Ignore Error    Wait Until Page Contains    Si la redirection    10
+
+!deconnexion
+    Select Frame    bgmainframe
+    !ClickElement    xpath=//div[@class='pictoApplicatif']/a/img[@src='/images/exit.gif']
+
+!loadPageGrid
+    [Arguments]    ${url}    ${browser}
+    log    "grid"
+    ${hubNodeSelenium}=    Get Environment Variable    hubNodeSelenium
+    ${portNodeSelenium}=    Get Environment Variable    portNodeSelenium
+    Run Keyword If    '${browser}' == 'ie'    Open Browser    ${url}    ie    remote_url=http://${hubNodeSelenium}:${portNodeSelenium}/wd/hub    desired_capabilities=platform:VISTA
+    ${profile}=    Navigate.create_profile_firefox
+    Run Keyword If    '${browser}' == 'firefox' or '${browser}' == 'ff'    Open Browser    ${url}    ff    remote_url=http://${hubNodeSelenium}:${portNodeSelenium}/wd/hub    desired_capabilities=platform:VISTA,marionette:false
+    ...    ff_profile_dir=${profile}
+    testNode.get_node_hostname    ${hubNodeSelenium}    ${portNodeSelenium}
+
+!loadPageMaster
+    [Arguments]    ${url}    ${browser}
+    log    ${url}    WARN
+    Run Keyword If    '${browser}' == 'ie'    Open Browser    ${url}    ie
+    ${profile}=    Run Keyword If    '${browser}' == 'firefox' or '${browser}' == 'ff'    Navigate.create_profile_firefox
+    Run Keyword If    '${browser}' == 'firefox' or '${browser}' == 'ff'    Open Browser    ${url}    ff    ff_profile_dir=${profile}
+
+!PathConfGrid
+    [Arguments]    ${plateforme_test}
+    ${JENKINS_HOME}=    Get Environment Variable    JENKINS_HOME
+    Import Variables    ${JENKINS_HOME}/sharedspace/${Choix_Git}/Test_Auto/Arg_Files/${plateforme_test}/conf_standard.py
+    Set Global Variable    ${path_relatif}    ${JENKINS_HOME}/sharedspace/${Choix_Git}/Test_Auto
+
+!PathConfSlave
+    [Arguments]    ${plateforme_test}
+    ${BASE}=    Get Environment Variable    BASE
+    Import Variables    ${BASE}\\sharedspace\\${Choix_Git}\\Test_Auto\\Arg_Files\\${plateforme_test}\\conf_standard.py
+    Set Global Variable    ${path_relatif}    ${BASE}\\sharedspace\\${Choix_Git}\\Test_Auto
+
+!GetVariableListServeur
+    [Arguments]    ${liste_serveur_file}
+    ${NODE_NAME}=    Get Environment Variable    NODE_NAME
+    Run Keyword If    '${NODE_NAME}' == 'master'    !ServeurGrid    ${liste_serveur_file}
+    Run Keyword If    '${NODE_NAME}' == 'PermanentSlave'    !ServeurSlave    ${liste_serveur_file}
+
+!ServeurSlave
+    [Arguments]    ${liste_serveur_file}
+    ${Choix_Git}=    Get Environment Variable    Choix_Git
+    ${BASE}=    Get Environment Variable    BASE
+    ${Plateforme}=    Get Environment Variable    Plateforme
+    Import Variables    ${BASE}/sharedspace/${Choix_Git}/Test_Auto/Arg_Files/${Plateforme}/${liste_serveur_file}
+
+!ServeurGrid
+    [Arguments]    ${liste_serveur_file}
+    ${Choix_Git}=    Get Environment Variable    Choix_Git
+    ${JENKINS_HOME}=    Get Environment Variable    JENKINS_HOME
+    ${Plateforme}=    Get Environment Variable    Plateforme
+    Import Variables    ${JENKINS_HOME}/sharedspace/${Choix_Git}/Test_Auto/Arg_Files/${Plateforme}/${liste_serveur_file}
+
+!WriteAndCommitGit
+    [Arguments]    ${pathFile}    ${nameVariableInFile}    ${newValueVariable}    ${nameFile}
+    Comment    Run Keyword If    '${slGrid}' == 'true'    ${path_relatif}=    Replace String    ${path_relatif}    \\
+    ...    /
+    Comment    Run Keyword If    '${slGrid}' != 'true'
+    Comment    ${path_relatif}=    Replace String    ${path_relatif}    \\    /
+    Navigate.Write In File    ${pathFile}    ${nameVariableInFile}    ${newValueVariable}
+    Comment    @{tmp}    Split String    ${pathFile}    ${nameFile}
+    Comment    ${result}=    Run Keyword If    '${slGrid}' == 'true' and '${Choix_Git}' == 'MAJ_Git'    Run Process    bash    ${path_relatif}/Scripts/commitGit.sh
+    ...    @{tmp}[0]    master    ${pathFile}    timeout=10    on_timeout=kill    shell=true
+    Comment    ${result}=    Run Keyword If    '${slGrid}' == 'false' and '${Choix_Git}' == 'MAJ_Git'    Run Process    ${path_relatif}\\Scripts\\commitGit.bat    @{tmp}[0]
+    ...    master    ${pathFile}    timeout=10    on_timeout=kill    shell=false
+    Comment    ${result}=    Run Keyword If    '${slGrid}' == 'true' and '${Choix_Git}' == 'MAJ_Git_Dev'    Run Process    bash    ${path_relatif}/Scripts/commitGit.sh
+    ...    @{tmp}[0]    dev    ${pathFile}    timeout=10    on_timeout=kill    shell=true
+    Comment    ${result}=    Run Keyword If    '${slGrid}' == 'false' and '${Choix_Git}' == 'MAJ_Git_Dev'    Run Process    ${path_relatif}/Scripts/commitGit.bat    @{tmp}[0]
+    ...    dev    ${pathFile}    timeout=10    on_timeout=kill    shell=false
+    Comment    log    ${result}
+
+!ClickElement
+    [Arguments]    ${element}
+    Wait Until Element Is Visible    ${element}    20
+    Click Element    ${element}
+
+!ClickLink
+    [Arguments]    ${link}
+    Wait Until Element Is Visible    ${link}    20
+    Click Link    ${link}
+
+!InputText
+    [Arguments]    ${element}    ${text}
+    Wait Until Element Is Visible    ${element}    20
+    Input Text    ${element}    ${text}
+
+!PressKey
+    [Arguments]    ${locator}    ${key}
+    Wait Until Element Is Visible    ${locator}    10
+    Press Key    ${locator}    ${key}
+
+!ClickButton
+    [Arguments]    ${element}
+    Wait Until Element Is Visible    ${element}
+    Click Button    ${element}
+
+!connexionSesamETE
+    [Arguments]    ${url}    ${login}    ${pwd}
+    !interfaceTest
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'True' or '${slGrid}' == 'true'    !loadPageGrid    ${url}    ${browser}
+
+!connexionE1
+    [Arguments]    ${url}    ${id}    ${pwd}    ${slGrid}    ${title}    ${urlApp}
+    [Documentation]    Start browser on Selenium Grid
+    !interfaceTest
+    ${url}=    Navigate.Encode Url    ${urlApp}    ${url}
+    Comment    log    ${urlApp}    WARN
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'True' or '${slGrid}' == 'true'    !loadPageGrid    ${url}    ${browser}
+    Select Window
+    !logon    ${title}    ${id}    ${pwd}

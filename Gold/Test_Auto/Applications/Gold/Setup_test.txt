@@ -1,0 +1,8 @@
+*** Settings ***
+Library           Selenium2Library
+Resource          ../../Ressources/function/function_Ovali.txt
+
+*** Test Cases ***
+Execution_fiches_Ovali
+    loadTestOvali
+    [Teardown]    Close All Browsers

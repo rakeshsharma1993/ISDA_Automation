@@ -1,0 +1,6 @@
+*** Settings ***
+Library           Selenium2Library
+Resource          ../Conf/conf_url_supervision.txt
+Resource          ../function/function_liste_url.txt
+
+*** Keywords ***

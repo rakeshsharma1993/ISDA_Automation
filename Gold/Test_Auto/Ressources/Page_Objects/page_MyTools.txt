@@ -1,0 +1,18 @@
+*** Settings ***
+Library           Selenium2Library
+Resource          ../conf/conf_MyTools.txt
+
+*** Keywords ***
+!checkUserMyTools
+    ${status}    ${value}=    Run Keyword And Ignore Error    Page Should Contain    Prod Release Management
+    Run Keyword If    '${status}' != 'PASS'    !deconnexionMyTools
+
+!deconnexionMyTools
+    !ClickLink    xpath=//a[@class='menu-item menu-item-logout']
+    Wait Until Page Does Not Contain    redirection
+    Select Window    Guardian connection
+
+!launchAppli
+    Page Should Contain    ${appliMyTools}
+    !ClickElement    xpath=//span[text()='${appliMyTools}']
+    Sleep    7

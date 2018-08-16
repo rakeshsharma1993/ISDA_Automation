@@ -1,0 +1,21 @@
+*** Settings ***
+Library           Selenium2Library
+Library           ../../Lib_Python/Navigate.py
+Resource          ../conf/conf_MyTools.txt
+Resource          ../Page_Objects/page_MyTools.txt
+
+*** Keywords ***
+connexionMyTools
+    #Open Browser    ${urlMyTools}    firefox
+    Open Browser    ${urlMyTools}    firefox    remote_url=http://10.238.109.76:4444/wd/hub    desired_capabilities=platform:VISTA,version:46
+    #Open Browser    ${urlMyTools}    ie    remote_url=http://10.238.109.76:4444/wd/hub    desired_capabilities=platform:VISTA,version:11
+    Navigate.Dismiss Poppup
+    #Sleep    5
+    ${pageTitle}=    Get Title
+    Run Keyword If    '${pageTitle}' == 'Portfolio - mytools'    !checkUserMyTools
+    !InputText    user    ${loginMyTools}
+    Input Password    password    ${pwdMyTools}
+    !ClickLink    linkValidForm
+    Sleep    10
+    ${pageTitle}=    Get Title
+    Run Keyword If    '${pageTitle}' == 'Portfolio - mytools'    !launchAppli

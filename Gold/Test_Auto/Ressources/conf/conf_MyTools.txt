@@ -1,0 +1,5 @@
+*** Variables ***
+${urlMyTools}     ${EMPTY}
+${loginMyTools}    ${EMPTY}
+${pwdMyTools}     ${EMPTY}
+${appliMyTools}    OVALI

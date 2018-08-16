@@ -1,0 +1,11 @@
+*** Settings ***
+Resource          ../Page_Object/ConnexionGold.txt
+
+*** Keywords ***
+connexionGOLD
+    !interfaceTest
+    !connexion    ${url_guardian}    ${id_guardian}    ${pwd_guardian}    false    ${title_guardian}    ${Sesam_URL}
+
+connexionGOLDE1
+    !interfaceTest
+    !connexionE1    ${url_guardian}    ${id_guardian}    ${pwd_guardian}    false    ${title_guardian}    ${URL}

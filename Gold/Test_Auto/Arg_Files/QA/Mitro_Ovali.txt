@@ -1,0 +1,17 @@
+--variable
+applicationName:mitro*
+
+--variable
+tName:Mitro_Ovali
+
+--variable
+plateform:Development
+
+--variable
+serverFerme1:nrmmtrqa
+
+--variable
+serverFerme2:nrmmtrqa
+
+--test
+Execution_fiches_Ovali

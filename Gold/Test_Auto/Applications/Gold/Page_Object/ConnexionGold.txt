@@ -1,0 +1,26 @@
+*** Settings ***
+Resource          ../Conf/connexionGold.txt
+Resource          ../../../Ressources/Page_Objects/standards.txt
+Resource          ../../../Ressources/conf/connexion_guardian.txt
+Resource          ../Conf/connexionGold.txt
+
+*** Keywords ***
+!connexionGold
+    log    ----------------- Connexion to Sesam ----------------
+    !connexionSesamETE    ${URL_FRONT_SESAM}    ${VALID_USER_SESAM}    ${VALID_PASSWORD_SESAM}
+    Wait Until Page Contains    Welcome    20s
+    log    ----------------- Connection to Sesam. Welcome displayed ----------------
+    Click Button    name=LOGIN_BTN
+    Page Should Contain Link    xpath=//a[@href="Dashboard"]    Dashboard
+    Page Should Contain Link    xpath=//a[@href="SearchLvos"]    Lvo
+    Page Should Contain Link    xpath=//a[@href="SearchSios?ID=ksaxena"]    Sio
+    Page Should Contain Link    xpath=//a[@href="SearchMeshSios"]    Meshing
+    Page Should Contain Link    xpath=//a[@href="SearchService"]    Connection
+    Page Should Contain Link    xpath=//a[@href="BulkUpdate?ID=1"]    Bulk Update
+    Page Should Contain Link    xpath=//a[@href="ItddBulkUpdate?ID=1"]    ITDD Bulk Update
+    Click Link    xpath=//a[@href="Dashboard"]
+    Sleep    5s
+    Click Link    xpath=//a[@href="SearchLvos"]
+    Sleep    5s
+    Click Link    xpath=//a[@href="SearchSios"]
+    Close Browser

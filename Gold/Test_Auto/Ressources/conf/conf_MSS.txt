@@ -1,0 +1,4 @@
+*** Variables ***
+${URL_FRONT_MSS}    ${EMPTY}
+${VALID_PASSWORD_MSS}    ${EMPTY}
+${VALID_USER_MSS}    ${EMPTY}

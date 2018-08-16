@@ -1,0 +1,11 @@
+*** Variables ***
+${applicationName}    ${EMPTY}
+${plateform}      ${EMPTY}
+${link_ovali}     ${EMPTY}
+${tName}          ${EMPTY}
+${server}         ${EMPTY}
+${serverFerme1}    ${EMPTY}
+${serverFerme2}    ${EMPTY}
+${url_guardian_ovali}    ${EMPTY}
+${id_guardian_ovali}    ${EMPTY}
+${pwd_guardian_ovali}    ${EMPTY}

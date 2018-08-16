@@ -1,0 +1,17 @@
+*** Settings ***
+Resource          ../Conf/connexionGold.txt
+
+*** Keywords ***
+!dbconnectionGold
+    log    --------Sesam ETE DB Connection---------
+    ${numTmp}=    DataBase.Requete SQL Oracle    ${DB_USER_ETE}    ${DB_PASSWORD_ETE}    ${DB_URL_ETE}    ${DB_PORT_ETE}    ${DB_NAME_ETE}
+    ...    ${requestSQL}
+    log    ${numTmp}
+    log    --------Completed-------------
+
+!dbconnectionGoldE1
+    log    --------Sesam E1(Maint) DB Connection---------
+    ${numTmp}=    DataBase.Requete SQL Oracle    ${DB_USER_E1}    ${DB_PASSWORD_E1}    ${DB_URL_E1}    ${DB_PORT_E1}    ${DB_NAME_E1}
+    ...    ${requestSQL}
+    log    ${numTmp}
+    log    --------Completed-------------

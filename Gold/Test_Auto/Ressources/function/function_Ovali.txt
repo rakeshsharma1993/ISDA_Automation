@@ -1,0 +1,41 @@
+*** Settings ***
+Library           Selenium2Library
+Library           ../../Lib_Python/lib_ovali.py
+Resource          ../conf/conf_Ovali.txt
+Resource          ../conf/connexion_guardian.txt
+Resource          function_MyTools.txt
+Resource          ../Page_Objects/standards.txt
+
+*** Keywords ***
+selectEnvironnement
+    [Arguments]    ${plateform}
+    Wait Until Keyword Succeeds    1min    5sec    Select Window    Ovali
+    Maximize Browser Window
+    Select Frame    frameApplication
+    Wait Until Element Is Visible    ctl00_Content_environmentDropDownList    20
+    Select From List By Label    ctl00_Content_environmentDropDownList    ${plateform}
+    Sleep    3
+    Wait Until Element Is Visible    appButton1    10
+    !ClickElement    appButton1
+    Wait Until Element Is Visible    ctl00_Content_LabelFilter    10
+    !InputText    ctl00_Content_LabelFilter    ${applicationName}
+    !ClickElement    ctl00_Content_ActiveFilter
+    Sleep    3
+
+table_Application
+    Wait Until Element Is Visible    ctl00_Content_GridViewApplication    20
+    log    ${server}
+    Run Keyword If    '${server}' == 'ferme1' or '${server}' == 'plateforme1' and '${Plateforme}' != 'PEXP'    Set Global Variable    ${server}    ${serverFerme1}
+    Run Keyword If    '${server}' == 'ferme2' or '${server}' == 'plateforme2' and '${Plateforme}' != 'PEXP'    Set Global Variable    ${server}    ${serverFerme2}
+    Run Keyword If    '${server}' != 'ferme1' and '${server}' != 'ferme2' \ and '${Plateforme}' == 'PEXP'    Set Global Variable    ${server}    all
+    log    Liste de la variable serveur : \ ${server}    WARN
+    Perform Test Ovali    ${applicationName}    ${tName}    ${server}
+
+loadTestOvali
+    ${tmp_plateform_ovali}=    Set Variable    ${plateform}
+    !interfaceTest
+    !connexion    ${url_guardian_ovali}    ${id_guardian_ovali}    ${pwd_guardian_ovali}    ${slGrid}    ${title_guardian}    ${link_ovali}
+    ${status}=    Get Length    ${tmp_plateform_ovali}
+    ${plateform}=    Set Variable If    ${status}>0    ${tmp_plateform_ovali}    ${plateform}
+    selectEnvironnement    ${plateform}
+    table_Application

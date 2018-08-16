@@ -1,0 +1,3 @@
+*** Settings ***
+Library           Selenium2Library
+Resource          ../Conf/conf_url_supervision.txt

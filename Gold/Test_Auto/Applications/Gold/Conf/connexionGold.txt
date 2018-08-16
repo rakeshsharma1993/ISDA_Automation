@@ -1,0 +1,11 @@
+*** Variables ***
+${url_guardian}    self.sso-dev.infra.ftgroup/
+${id_guardian}    SNKS7999
+${pwd_guardian}    Abc@123
+${title_guardian}    Home in the information system
+${gold_user}      goldmaint
+${gold_password}    goldmaint_189
+${gold_host}      10.237.93.189
+${gold_port}      1521
+${DB_Connection}    'goldmaint/goldmaint_189@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.237.93.189)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=GOLDMNT)))'
+${DB_Connect_String}    'goldmaint/goldmaint_189@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.237.93.189)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=GOLDMNT)))'

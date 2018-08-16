@@ -1,0 +1,5 @@
+*** Variables ***
+${url_gassi}      ${EMPTY}
+${id_gassi}       ${EMPTY}
+${pwd_gassi}      ${EMPTY}
+${title_gassi}    Mon SI : l'accueil dans le Système d'Information

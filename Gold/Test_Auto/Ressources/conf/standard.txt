@@ -1,0 +1,8 @@
+*** Variables ***
+${browser}        ${EMPTY}
+${slGrid}         ${EMPTY}
+${plateforme}     ${EMPTY}
+${reporting}      ${EMPTY}
+${ForcerStatus}    ${EMPTY}
+${path_relatif}    ${EMPTY}
+${Choix_Git}      ${EMPTY}

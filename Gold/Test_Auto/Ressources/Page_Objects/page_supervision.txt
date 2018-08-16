@@ -1,0 +1,94 @@
+*** Settings ***
+Library           Selenium2Library
+Resource          page_supervision.txt
+Resource          standards.txt
+
+*** Keywords ***
+!pageContain
+    [Arguments]    ${url}    ${expressions1}    ${expressions2}
+    !interfaceTest
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Page Contains    ${expressions1}    2
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'FAIL'    !pageContainError    ${expressions2}    ${url}
+
+!pageNotContain
+    [Arguments]    ${url}    ${expressions1}    ${expressions2}
+    !interfaceTest
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Page Contains    ${expressions1}    5
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'FAIL'    !pageNotContainError    ${expressions2}    ${url}
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'PASS'    !LogError    ${url}
+
+!pageContainError
+    [Arguments]    ${expressions}    ${element}
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Page Contains    ${expressions}    5
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'FAIL'    !LogError    ${element}
+
+!pageNotContainError
+    [Arguments]    ${expressions}    ${element}
+    ${status}    ${value}=    Run Keyword And Ignore Error    Page Should Contain    ${expressions}
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'PASS'    !LogError    ${element}
+
+!LogError
+    [Arguments]    ${element}
+    log    ${element}    error
+    Fail
+
+!loadPageSupervisionGrid
+    [Arguments]    ${url}    ${browser}
+    ${portNodeSelenium}=    Get Environment Variable    portNodeSelenium
+    Run Keyword If    '${browser}' == 'ie'    Open Browser    ${url}    ie    remote_url=${hubNodeSelenium}:${portNodeSelenium}/wd/hub    desired_capabilities=platform:VISTA,version:11
+    Run Keyword If    '${browser}' == 'firefox' or '${browser}' == 'ff'    Open Browser    ${url}    firefox    remote_url=${hubNodeSelenium}:${portNodeSelenium}/wd/hub    desired_capabilities=platform:VISTA,version:45
+    testNode.get_node_hostname    ${hubNodeSelenium}:${portNodeSelenium}/wd/hub
+
+!loadPageSupervisionMaster
+    [Arguments]    ${url}    ${browser}
+    Run Keyword If    '${browser}' == 'ie'    Open Browser    ${url}    ie
+    Run Keyword If    '${browser}' == 'firefox' or '${browser}' == 'ff'    Open Browser    ${url}    ff    ff_profile_dir=${path_ff_profile_vm}
+    Maximize Browser Window
+    sleep    5s
+    Page Should Contain    QuoTO Monitoring Page
+    ${status1}    ${value}=    Run Keyword    Wait Until Page Contains    Opening connection... OK    5
+    log    ${status1}
+    ${status2}    ${value}=    Run Keyword    Wait Until Page Contains    Closing connection... OK    5
+    log    ${status2}
+    ${status3}    ${value}=    Run Keyword    Wait Until Page Contains    Customer WS ... OK    5
+    log    ${status3}
+    ${status4}    ${value}=    Run Keyword    Wait Until Page Contains    Agreement WS ... OK    5
+    log    ${status4}
+    ${status5}    ${value}=    Run Keyword    Wait Until Page Contains    Billing account WS ... OK    5
+    log    ${status5}
+    ${status6}    ${value}=    Run Keyword    Wait Until Page Contains    Ref table WS ... OK    5
+    log    ${status6}
+    ${status7}    ${value}=    Run Keyword    Wait Until Page Contains    Notify Customer Order WS ... OK    5
+    log    ${status7}
+    ${status8}    ${value}=    Run Keyword    Wait Until Page Contains    Find And Get Quote WS ... OK    5
+    log    ${status8}
+    ${status9}    ${value}=    Run Keyword    Wait Until Page Contains    PAN publication WS ... OK    5
+    log    ${status9}
+    ${status10}    ${value}=    Run Keyword    Wait Until Page Contains    Manage Quote WS ... OK    5
+    log    ${status10}
+    ${status11}    ${value}=    Run Keyword    Wait Until Page Contains    Inform on Quote Request WS ... OK    5
+    log    ${status11}
+    ${status12}    ${value}=    Run Keyword    Wait Until Page Contains    Manage Party Customer Data Management WS ... OK    5
+    log    ${status12}
+    ${status13}    ${value}=    Run Keyword    Wait Until Page Contains    SUPERVISION OK    5
+    log    ${status13}
+    Run Keyword If    '${status1}' == 'PASS' and '${status2}' == 'PASS' and '${status3}' == 'PASS' and '${status4}' == 'PASS' and '${status5}' == 'PASS' and '${status6}' == 'PASS' \ and '${status7}' == 'PASS' \ and '${status8}' == 'PASS' \ and '${status9}' == 'PASS' \ and '${status10}' == 'PASS' \ and '${status11}' == 'PASS' \ and '${status12}' == 'PASS' \ and '${status13}' == 'PASS'    Log    ---------------- \ QUOTO Supervision Successfull --------------
+
+
+!connexionSupervision
+    [Arguments]    ${url}    ${tmp}
+    !interfaceTest
+    Run Keyword If    '${slGrid}' == 'false'    !loadPageSupervisionMaster    ${url}    ${browser}
+    Run Keyword If    '${slGrid}' == 'true'    !loadPageSupervisionGrid    ${url}    ${browser}
+    Set Global Variable    ${tmp}    true
+
+!CheckSupersion
+    [Arguments]    ${url}    ${tmp}    ${identifiantPage}    ${messagePage1}    ${messagePage2}    ${contain}
+    ...    ${typeSupervision}
+    Log    URL de supervision ${typeSupervision} : ${url}    WARN
+    Run Keyword If    '${tmp}' != 'true'    !connexionSupervision    ${url}    ${tmp}
+    Run Keyword If    '${tmp}' == 'true'    Switch Url    ${url}
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Page Contains    ${identifiantPage}    5
+    Run Keyword If    '${status}' == 'PASS' and '${contain}'== 'true'    !pageContain    ${url}    ${messagePage1}    ${messagePage2}
+    Run Keyword If    '${status}' == 'PASS' and '${contain}' != 'true'    !pageNotContain    ${url}    ${messagePage1}    ${messagePage2}
+    Run Keyword And Continue On Failure    Run Keyword If    '${status}' == 'FAIL'    !LogError    ${url}

@@ -1,0 +1,9 @@
+*** Settings ***
+Resource          ../Page_Object/DBConnectionGold.txt
+
+*** Keywords ***
+dbconnectionGOLD
+    [Arguments]    ${requestSQL}
+    Run Keyword If    '${Plateforme}' == 'E1'    !dbconnectionGoldE1    ${requestSQL}
+    Run Keyword If    '${Plateforme}' == 'AM'    !dbconnectionGold    ${requestSQL}
+    log    ----------------- Database Script Executed Successfully----------------

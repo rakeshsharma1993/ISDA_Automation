@@ -1,0 +1,15 @@
+*** Settings ***
+Resource          Function/function_connexion_Gold.txt
+Resource          Function/function_dbconnexion_Gold.txt
+Library           ../../Lib_Python/DataBase.py
+Library           DatabaseLibrary
+Resource          Conf/connexionGold.txt
+
+*** Variables ***
+
+*** Test Cases ***
+Gold_Database
+    Connect To Database Using Custom Params    cx_Oracle    ${DB_Connection}
+    ${link_MNT1}=    Query    select * from v$database
+    log to console    ${link_MNT1}
+    log    ${link_MNT1}

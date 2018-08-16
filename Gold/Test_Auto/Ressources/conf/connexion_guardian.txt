@@ -1,0 +1,5 @@
+*** Variables ***
+${url_guardian}    https://self.sso-dev.infra.ftgroup/
+${id_guardian}    GDQC9380
+${pwd_guardian}    November1@
+${title_guardian}    Home in the information system
