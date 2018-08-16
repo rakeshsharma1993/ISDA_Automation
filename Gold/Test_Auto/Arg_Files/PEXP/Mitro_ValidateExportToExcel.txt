@@ -1,6 +1,0 @@
---variable
-file_to_check:C:\SeleniumGrid\Downloads\Maintenance_Data.xlsx
-
---test
-To_Validate_Export_to_Excel_Functionality
-

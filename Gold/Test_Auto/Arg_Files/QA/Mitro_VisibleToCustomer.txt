@@ -1,2 +1,0 @@
---test
-To_Validate_visible_to_customer_functionality
