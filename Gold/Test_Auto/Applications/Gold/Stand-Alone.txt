@@ -8,7 +8,7 @@ Resource          Conf/connexionGold.txt
 *** Variables ***
 
 *** Test Cases ***
-Gold_Database
+To_Gold_Database
     Connect To Database Using Custom Params    cx_Oracle    ${DB_Connection}
     ${link_MNT1}=    Query    select * from v$database
     log to console    ${link_MNT1}
