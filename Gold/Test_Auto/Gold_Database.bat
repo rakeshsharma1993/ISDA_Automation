@@ -1,0 +1,1 @@
+pybot --argumentfile ${WORKSPACE}\Gold_Database\Gold\Test_Auto\Arg_Files\%Platform%\%JOB_NAME%.txt --variable Platform:%Platform% --variable Deployment_Type:%Deployment_Type%  ${WORKSPACE}\Gold_Database\Gold\Test_Auto\Applications\Gold\Stand-Alone.txt 
