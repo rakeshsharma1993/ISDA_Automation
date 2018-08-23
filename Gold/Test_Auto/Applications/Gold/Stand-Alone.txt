@@ -11,7 +11,7 @@ Resource          Conf/connexionGold.txt
 To_Gold_Database
     Connect To Database Using Custom Params    cx_Oracle    ${DB_Connection}
     Comment    Capture Page Screenshot    db_connection.png
-    ${link_MNT1}=    Query    select * from v$database
+    ${link_MNT1}=    Query    rman target goldmaint/goldmaint_189@maintgold
     Comment    Capture Page Screenshot    Query.png
     log to console    ${link_MNT1}
     log    ${link_MNT1}
